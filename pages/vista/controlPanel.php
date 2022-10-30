@@ -1,3 +1,14 @@
+<?php @session_start();
+
+if(!isset($_SESSION['autenticado']) && $_SESSION['autenticado'] != true){
+  header("Location: ./inicioSesion.php");
+  exit();
+}
+
+include_once '../vista/titulo.php';
+
+?>
+
 <!DOCTYPE html>
 <html
   lang="es"
@@ -50,6 +61,7 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../../assets/js/config.js"></script>
+    <script src="../../assets/sweetalert/sweetalert2.all.min.js"></script>
   </head>
 
   <body>
@@ -72,7 +84,7 @@
             
             <?php 
               if(isset($_GET['modulo']) && $_GET['modulo'] == 'prestamos'){
-                include_once 'modulos/prestamo/prestamo.php';
+                include_once 'modulos/prestamo.php';
               }  
             ?>
 

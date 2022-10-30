@@ -1,6 +1,6 @@
 <?php
 
-function connect(){
+function conexionBaseDeDatos(){
 	$user = 'root';
 	$password = '';
 
@@ -18,4 +18,5 @@ function connect(){
         print_r('Error connection: ' . $e->getMessage());
     }
 }
+
 ?>

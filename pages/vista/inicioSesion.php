@@ -1,3 +1,13 @@
+<?php @session_start();
+
+if(isset($_SESSION['autenticado']) && $_SESSION['autenticado'] == true){
+  header("Location: ../../index.php");
+  exit();
+}
+
+include_once '../vista/titulo.php';
+
+?>
 <!DOCTYPE html>
 <!-- beautify ignore:start -->
 <html
@@ -50,6 +60,7 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../../assets/js/config.js"></script>
+    <script src="../../assets/sweetalert/sweetalert2.all.min.js"></script>
   </head>
 
   <body>
@@ -60,20 +71,6 @@
         <div class="authentication-inner">
           <!-- Register -->
           <div class="card">
-            
-            <?php if($mensaje != ""): ?>
-              <div class="card-header">
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                  <?php if($mensaje == "empty"): ?>
-                    <strong>¡Error!</strong> Debe llenar todos los campos.
-                  <?php elseif($mensaje == "error"): ?>
-                    <strong>¡Error!</strong> Usuario o contraseña incorrectos.
-                  <?php endif; ?>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-              </div>
-            <?php endif; ?>
-
             <div class="card-body">
               <!-- Logo -->
               <div class="app-brand justify-content-center">
@@ -140,7 +137,7 @@
               <h4 class="mb-2">¡Bienvenido al sistema!</h4>
               <p class="mb-4">Inicia sesión con tu cuenta para administrar tu sistema cooperativo.</p>
 
-              <form id="formAuthentication" class="mb-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+              <form id="formAuthentication" class="mb-3" action="" method="POST">
                 <div class="mb-3">
                   <label for="email" class="form-label">Correo Electrónico</label>
                   <input
@@ -149,7 +146,7 @@
                     id="email"
                     name="email-username"
                     placeholder="Ingresa tu correo electrónico"
-                    value="<?php echo (isset($_REQUEST['email-username'])) ? $_REQUEST['email-username'] : "";  ?>"
+                    value=""
                     autofocus
                   />
                 </div>
@@ -163,7 +160,7 @@
                   <div class="input-group input-group-merge">
                     <input
                       type="password"
-                      id="password"
+                      id="clave"
                       class="form-control"
                       name="password"
                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
@@ -179,7 +176,7 @@
                   </div>
                 </div>
                 <div class="mb-3">
-                  <button class="btn btn-primary d-grid w-100" type="submit">Iniciar sesión</button>
+                  <button class="btn btn-primary d-grid w-100" type="button" onclick="validarCredenciales()">Iniciar sesión</button>
                 </div>
               </form>
             </div>
@@ -207,6 +204,7 @@
     <script src="../../assets/js/main.js"></script>
 
     <!-- Page JS -->
+    <script src="../../assets/js/inicioSesion.js"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

@@ -1,9 +1,9 @@
-<?php
-    if(isset($_SESSION['autenticado']) && $_SESSION['autenticado'] == 'SI'){
-        
+<?php @session_start();
+
+    if(isset($_SESSION['autenticado']) && $_SESSION['autenticado'] == true){
+        header("Location: ./pages/vista/controlPanel.php");
     }else{
-        echo "<script language='javascript'>";
-        echo "location.href='./pages/controlador/controladorInicioSesion.php';";
-        echo "</script>";
+        header("Location: ./pages/vista/inicioSesion.php");
+        exit();
     }
 ?>
