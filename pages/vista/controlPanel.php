@@ -84,7 +84,12 @@ include_once '../vista/titulo.php';
             
             <?php 
               if(isset($_GET['modulo']) && $_GET['modulo'] == 'prestamos'){
-                include_once 'modulos/prestamo.php';
+                if(isset($_REQUEST['nuevo']) && $_REQUEST['nuevo'] == 'true'){
+                  include_once 'modulos/prestamoNuevo.php';
+                }else{
+                  include_once 'modulos/prestamo.php';
+                }
+                
               }  
             ?>
 

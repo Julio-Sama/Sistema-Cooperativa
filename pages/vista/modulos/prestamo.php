@@ -2,7 +2,7 @@
 
     <div class="d-flex align-items-center justify-content-between py-3">
         <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Listado de Préstamos</h4>
-        <button class="btn btn-primary" type="button"><span class="tf-icons bx bx-plus-circle"></span> Nuevo</button>
+        <button class="btn btn-primary" type="button" onclick="window.location.href='?modulo=prestamos&nuevo=true'"><span class="tf-icons bx bx-plus-circle"></span> Nuevo</button>
     </div>
 
     <!-- Basic Bootstrap Table -->
@@ -56,15 +56,6 @@
                     ?>
                 </tbody>
             </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-            </nav>
         </div>
     </div>
 </div>
