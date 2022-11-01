@@ -4,7 +4,7 @@
         <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Nuevo préstamo</h4>
     </div>
     <div class="card">
-        <form>
+        <form class="m-4">
             <div class="mb-3">
                 <label class="form-label" for="basic-default-fullname">Full Name</label>
                 <input type="text" class="form-control" id="basic-default-fullname" placeholder="John Doe" />

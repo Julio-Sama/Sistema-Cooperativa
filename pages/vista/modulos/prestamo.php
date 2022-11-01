@@ -46,7 +46,7 @@
                                 echo "<td> $". number_format($resultado['monto_prestamo'], 2) ."</td>";
                                 echo "<td>".$resultado['fecha_emision_prestamo']."</td>";
                                 echo "<td><span class='badge bg-label-warning me-1'>Pendiente</span></td>";
-                                echo "<td><button class='btn btn-outline-success' type='button'><span class='tf-icons bx bx-edit'></span></button> <button class='btn btn-outline-danger' type='button'><span class='tf-icons bx bx-trash'></span></button></td>";
+                                echo "<td><button class='btn btn-outline-info' type='button'><span class='tf-icons bx bx-show'></span></td>";
                                 echo "</tr>";
                             }
 
