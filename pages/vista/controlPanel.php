@@ -12,11 +12,11 @@ include_once '../vista/titulo.php';
 <!DOCTYPE html>
 <html
   lang="es"
-  class="light-style layout-menu-fixed"
+  class="layout-menu-hover"
   dir="ltr"
   data-theme="theme-default"
   data-assets-path="../assets/"
-  data-template="vertical-menu-template-free"
+  data-template="vertical-menu-template"
 >
   <head>
     <meta charset="utf-8" />

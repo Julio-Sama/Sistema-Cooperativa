@@ -1,4 +1,4 @@
-<div class="container-xxl flex-grow-2 container-p-y">
+<div class="container-xxl flex-grow-2">
 
     <div class="d-flex align-items-center justify-content-between py-3">
         <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Listado de Préstamos</h4>
@@ -45,8 +45,8 @@
                                 echo "<td>".$resultado['nombre_socio']. " " . $resultado['apellido_socio'] ."</td>";
                                 echo "<td> $". number_format($resultado['monto_prestamo'], 2) ."</td>";
                                 echo "<td>".$resultado['fecha_emision_prestamo']."</td>";
-                                echo "<td><span class='badge bg-label-warning me-1'>Pendiente</span></td>";
-                                echo "<td><button class='btn btn-outline-info' type='button'><span class='tf-icons bx bx-show'></span></td>";
+                                echo "<td><span class='badge bg-label-danger me-1'>Pendiente</span></td>";
+                                echo "<td><button class='btn btn-outline-info' type='button'><span class='tf-icons bx bx-show'></span> Ver pagos</td>";
                                 echo "</tr>";
                             }
 
@@ -59,4 +59,3 @@
         </div>
     </div>
 </div>
-<script src="../../assets/js/pagination.js"></script>
