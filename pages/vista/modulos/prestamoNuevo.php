@@ -86,10 +86,10 @@
                             <label class="form-label" for="select-forma-pago">Forma de Pago</label>
                             <select class="form-select" id="select-forma-pago" aria-label="Default select example">
                                 <option selected>Seleccione</option>
-                                <option value="1">Diario</option>
-                                <option value="2">Quincenal</option>
-                                <option value="3">Mensual</option>
-                                <option value="4">Anual</option>
+                                <option value="day">Diario</option>
+                                <option value="week">Semanal</option>
+                                <option value="week 5 day">Quincenal</option>
+                                <option value="month">Mensual</option>
                             </select>
                         </div>
                         <div class="col-md-5 mb-3">
@@ -99,12 +99,12 @@
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="">&nbsp</label><br>
-                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas">Calcular</button>
+                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas" onclick="calcularCuotas()">Calcular</button>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label" for="input-monto-cuota">Monto por cuota</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
@@ -112,23 +112,35 @@
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label" for="input-monto-prestamo">Total interés</label>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="input-monto-interes">Total interés</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-prestamo" type="text" class="form-control" value=""
+                                <input id="input-monto-interes" type="text" class="form-control" value=""
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label" for="input-monto-prestamo">Monto total</label>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="input-seguro-prestamo">Seguro</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-prestamo" type="text" class="form-control" value=""
+                                <input id="input-seguro-prestamo" type="text" class="form-control" value=""
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="input-monto-total">Monto total</label>
+                            <div class="input-group input-group-merge disabled">
+                                <span class="input-group-text" id="basic-addon-search31">$</span>
+                                <input id="input-monto-total" type="text" class="form-control" value=""
+                                    placeholder="0.00" disabled />
+                            </div>
+                        </div>
+
+                        
                     </div>
                 </div>
             </div>
@@ -145,6 +157,12 @@
                                         <th>Monto</th>
                                     </tr>
                                 </thead>
+
+                                <tbody id="tabla-cuotas">
+                                    <tr>
+                                        <td colspan="3" class="text-center">No hay datos</td>
+                                    </tr>
+                                </tbody>
 
                                 <!--Generar cuotas -->
 

@@ -1,3 +1,46 @@
+function calcularCuotas(){
+    var parametros = {
+        opcion : "calcularCuotas",
+        monto : $("#input-monto-prestamo").val(),
+        num_cuotas : $("#input-num-cuotas").val(),
+        id_destino : $("#select-destino").val(),
+        forma_pago : $("#select-forma-pago").val(),
+        fecha_inicio : $("#input-fecha-inicio").val()
+    }
+
+    $.ajax({
+        data: parametros,
+        url: '../../pages/modelo/daoPrestamo.php',
+        type: 'post',
+        dataType: 'json',
+        error: function (thrownError) {
+            mostrarMensaje("Error", thrownError, "error");
+        },
+
+        success: function (respuesta) {
+            if(respuesta[0] == "error"){
+                mostrarMensaje("Error", respuesta[1], "error");
+            }else{
+                $("#input-monto-cuota").val(respuesta[0]);
+                $("#input-monto-interes").val(respuesta[1]);
+                $("#input-seguro-prestamo").val(respuesta[2]);
+                $("#input-monto-total").val(respuesta[3]);
+                $("#tabla-cuotas").html(respuesta[4]);
+            }
+        }
+    })
+}
+
+function generarCuotas(){
+    var parametros = {
+        monto : $("#input-monto-prestamo").val(),
+        num_cuotas : $("#input-num-cuotas").val(),
+        id_destino : $("#select-destino").val(),
+        forma_pago : $("#select-forma-pago").val(),
+        fecha_inicio : $("#input-fecha-inicio").val()
+    }
+}
+
 function mostrarInteres(){
     var parametros = {
         opcion : "obtenerInteres",
