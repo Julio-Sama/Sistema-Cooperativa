@@ -12,7 +12,7 @@ include_once '../vista/titulo.php';
 <!DOCTYPE html>
 <html
   lang="es"
-  class="layout-menu-hover"
+  class="layout-menu-collapsed"
   dir="ltr"
   data-theme="theme-default"
   data-assets-path="../assets/"
@@ -127,6 +127,8 @@ include_once '../vista/titulo.php';
 
     <!-- Page JS -->
     <script src="../../assets/js/dashboards-analytics.js"></script>
+
+    <script src="../../assets/js/prestamo.js"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
