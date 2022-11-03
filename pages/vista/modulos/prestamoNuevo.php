@@ -69,7 +69,7 @@
 
                                     $resultado = $query->fetchAll();
                                     
-                                    foreach($resultado as $dato){
+                                    foreach($resultado as $dato){ //Recorremos el array de datos
                                         echo '<option value="'.$dato['id_destino'].'">'.$dato['nom_destino'].'</option>';
                                     }
                                 ?>
@@ -94,12 +94,12 @@
                         </div>
                         <div class="col-md-5 mb-3">
                             <label class="form-label" for="input-fecha-inicio">Fecha de inicio</label>
-                            <input type="date" class="form-control" id="input-fecha-inicio" />
+                            <input type="date" class="form-control" id="input-fecha-inicio" required pattern="\d{4}-\d{2}-\d{2}"/>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="">&nbsp</label><br>
-                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas" onclick="calcularCuotas()">Calcular</button>
+                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas" onclick="calcularCuotas()">Generar</button>
                         </div>
                     </div>
 
