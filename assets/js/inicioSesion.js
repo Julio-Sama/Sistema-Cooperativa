@@ -31,6 +31,7 @@ function mostrarMensaje(titulo, texto, tipo){
         title: titulo,
         text: texto,
         icon: tipo,
-        confirmButtonColor: '#217373'
+        confirmButtonColor: '#217373',
+        confirmButtonText: 'Cerrar'
     });
 }

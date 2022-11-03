@@ -38,10 +38,115 @@ if($_REQUEST['opcion'] == 'buscarSocio'){
     }
 
     echo json_encode($resultado);
+}else if($_REQUEST['opcion'] == 'registrarPrestamo'){
+    $resultado = [];
+
+    $id_socio = $_REQUEST['cod_socio'];
+    $monto = $_REQUEST['monto'];
+    $num_cuotas = $_REQUEST['num_cuotas'];
+    $id_destino = $_REQUEST['id_destino'];
+    $forma_pago = $_REQUEST['forma_pago'];
+    $fecha_inicio = $_REQUEST['fecha_inicio'];
+
+    if(empty($id_socio) || empty($monto) || empty($num_cuotas) || empty($id_destino) || empty($forma_pago) || empty($fecha_inicio)){
+        $resultado = ['error', 'Complete todos los campos'];
+    }else{
+        $resultado = registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio);
+    }
+
+    echo json_encode($resultado);
+}
+
+function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio){
+    include_once '../modelo/conexion.php';
+    $conexion = conexionBaseDeDatos();
+    $resultado = null;
+    $monto_cuota = 0;
+    $monto_total = 0;
+
+    try{
+        $sql = "SELECT * FROM destino WHERE id_destino = :id_destino";
+        $statement = $conexion->prepare($sql);
+        $statement->execute(array(":id_destino" => $id_destino));
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $seguro = $monto * 0.058; // 5.8%
+        $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
+
+        $monto_total = $monto + $interes + $seguro; // Monto total a pagar
+        $monto_cuota = $monto_total / $num_cuotas; // Monto de cada cuota
+
+        $sql = "INSERT INTO prestamo (
+            cod_socio,
+            id_destino,
+            monto_prestamo, 
+            abono_capital_prestamo,
+            seguro_prestamo,
+            fecha_emision_prestamo,
+            fecha_inicio_pago,
+            forma_pago_prestamo
+        ) VALUES (
+            :cod_socio,
+            :id_destino,
+            :monto, 
+            :abono_capital, 
+            :seguro, 
+            :fecha_emision,
+            :fecha_inicio,
+            :forma_pago
+        )";
+
+        $statement = $conexion->prepare($sql);
+        $statement->execute(array(
+            ":cod_socio" => $id_socio,
+            ":id_destino" => $id_destino,
+            ":monto" => $monto_total,
+            ":abono_capital" => 0,
+            ":seguro" => $seguro,
+            ":fecha_emision" => date('Y-m-d'),
+            ":fecha_inicio" => $fecha_inicio,
+            ":forma_pago" => $forma_pago
+        ));
+
+        $id_prestamo = $conexion->lastInsertId();
+
+        for($i = 0; $i < $num_cuotas; $i++){
+            $fecha = date("Y-m-d", strtotime($fecha_inicio . " + $i $forma_pago"));
+
+            $sql = "INSERT INTO cuota (
+                id_prestamo,
+                fecha_pago_cuota,
+                monto_cuota,
+                mora_cuota,
+                estado_cuota
+            ) VALUES (
+                :id_prestamo,
+                :fecha_pago,
+                :monto_cuota,
+                :mora,
+                :estado
+            )";
+
+            $statement = $conexion->prepare($sql);
+            $statement->execute(array(
+                ":id_prestamo" => $id_prestamo,
+                ":fecha_pago" => $fecha,
+                ":monto_cuota" => $monto_cuota,
+                ":mora" => 0,
+                ":estado" => 'Pendiente'
+            ));
+        }
+
+        $resultado = ['success', 'Prestamo registrado correctamente'];
+    }catch(PDOException $e){
+        $resultado = ["error", $e->getMessage()];
+    }
+
+    return $resultado;
 }
 
 function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio){
-     include_once '../modelo/conexion.php';
+    include_once '../modelo/conexion.php';
     $conexion = conexionBaseDeDatos();
     $resultado = null;
     $monto_total = 0;

@@ -3,7 +3,7 @@
         <div class="d-flex align-items-center justify-content-between py-3">
             <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Nuevo préstamo</h4>
             <div>
-                <button type="button" class="btn btn-primary" id="btn-reg-prestamo">Registrar préstamo</button>
+                <button type="button" class="btn btn-primary" id="btn-reg-prestamo" onclick="registrarPrestamo()">Registrar préstamo</button>
                 <button type="button" class="btn btn-outline-danger" id="btn-cancel-prestamo">Cancelar</button>
             </div>
         </div>

@@ -1,3 +1,30 @@
+function registrarPrestamo(){
+    var parametro = {
+        opcion : "registrarPrestamo",
+        cod_socio : $("#input-cod-socio").val(),
+        monto : $("#input-monto-prestamo").val(),
+        num_cuotas : $("#input-num-cuotas").val(),
+        id_destino : $("#select-destino").val(),
+        forma_pago : $("#select-forma-pago").val(),
+        fecha_inicio : $("#input-fecha-inicio").val()
+    }
+
+    $.ajax({
+        data: parametro,
+        url: '../../pages/modelo/daoPrestamo.php',
+        type: 'post',
+        dataType: 'json',
+        error: function (thrownError) {
+            mostrarMensaje("Error", thrownError, "error");
+        },
+
+        success: function (respuesta) {
+            mostrarMensaje("Mensaje", respuesta[1], respuesta[0]);
+        }
+
+    })
+}
+
 function calcularCuotas(){
     var parametros = {
         opcion : "calcularCuotas",
@@ -89,6 +116,7 @@ function mostrarMensaje(titulo, texto, tipo){
         title: titulo,
         text: texto,
         icon: tipo,
-        confirmButtonColor: '#217373'
+        confirmButtonColor: '#217373',
+        confirmButtonText: 'Cerrar'
     });
 }
