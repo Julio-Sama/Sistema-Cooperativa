@@ -4,7 +4,7 @@
             <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Nuevo préstamo</h4>
             <div>
                 <button type="button" class="btn btn-primary" id="btn-reg-prestamo" onclick="registrarPrestamo()">Registrar préstamo</button>
-                <button type="button" class="btn btn-outline-danger" id="btn-cancel-prestamo">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger" id="btn-cancel-prestamo" onclick="window.location.href='controlPanel.php?modulo=prestamos'">Cancelar</button>
             </div>
         </div>
 
@@ -20,7 +20,7 @@
                                 <input id="input-buscar-socio" type="search" class="form-control"
                                     placeholder="Buscar socio" aria-label="Search..."
                                     onkeypress="buscarSocio()"
-                                    aria-describedby="basic-addon-search31" />
+                                    aria-describedby="basic-addon-search31" autofocus/>
                             </div>
                         </div>
                     </div>
@@ -86,10 +86,10 @@
                             <label class="form-label" for="select-forma-pago">Forma de Pago</label>
                             <select class="form-select" id="select-forma-pago" aria-label="Default select example">
                                 <option selected>Seleccione</option>
-                                <option value="day">Diario</option>
-                                <option value="week">Semanal</option>
-                                <option value="week 5 day">Quincenal</option>
-                                <option value="month">Mensual</option>
+                                <option value="Diario">Diario</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Quincenal">Quincenal</option>
+                                <option value="Mensual">Mensual</option>
                             </select>
                         </div>
                         <div class="col-md-5 mb-3">
@@ -163,9 +163,6 @@
                                         <td colspan="3" class="text-center">No hay datos</td>
                                     </tr>
                                 </tbody>
-
-                                <!--Generar cuotas -->
-
                             </table>
                         </div>
                     </div>

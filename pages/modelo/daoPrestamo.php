@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('America/El_Salvador'); //Establecemos la zona horaria
 
 if($_REQUEST['opcion'] == 'buscarSocio'){
     $busqueda = $_REQUEST['busqueda']; /* Variable de búsqueda */
@@ -108,7 +109,7 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_p
             ":forma_pago" => $forma_pago
         ));
 
-        $id_prestamo = $conexion->lastInsertId();
+        $id_prestamo = $conexion->lastInsertId(); // Obtenemos el id del prestamo
 
         for($i = 0; $i < $num_cuotas; $i++){
             $fecha = date("Y-m-d", strtotime($fecha_inicio . " + $i $forma_pago"));
@@ -162,10 +163,25 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
         $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
 
         $monto_total = $monto + $interes + $seguro; // Monto total a pagar
-        $monto_cuota = $monto_total / $num_cuotas; // Monto de cada cuota
+        $monto_cuota = $monto_total / $num_cuotas; // Monto de cada cuota 
 
         for($i = 1; $i <= $num_cuotas; $i++){
-            $fecha = date("d-m-Y", strtotime($fecha_inicio . " + $i $forma_pago"));
+            $aux = $fecha_inicio . " + $i ";
+
+            if($forma_pago == 'Diario'){
+                $aux .= 'day';
+            }else if($forma_pago == 'Semanal'){
+                $aux .= 'week';
+            }else if($forma_pago == 'Quincenal'){
+                if(date('d', strtotime($fecha_inicio)) <= 15){
+                    $aux .= 'month';
+                }
+            }else if($forma_pago == 'Mensual'){
+                $aux .= 'month';
+            }
+
+            $fecha = date("d-m-Y", strtotime($aux));
+
             $tabla_cuotas .= "<tr>
                                 <td>".($i)."</td>
                                 <td>" . $fecha . "</td>

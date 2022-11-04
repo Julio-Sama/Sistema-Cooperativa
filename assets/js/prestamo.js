@@ -20,8 +20,11 @@ function registrarPrestamo(){
 
         success: function (respuesta) {
             mostrarMensaje("Mensaje", respuesta[1], respuesta[0]);
-        }
 
+            setTimeout(function(){
+                window.location.replace("controlPanel.php?modulo=prestamos");
+            }, 1000);   
+        }
     })
 }
 
@@ -56,16 +59,6 @@ function calcularCuotas(){
             }
         }
     })
-}
-
-function generarCuotas(){
-    var parametros = {
-        monto : $("#input-monto-prestamo").val(),
-        num_cuotas : $("#input-num-cuotas").val(),
-        id_destino : $("#select-destino").val(),
-        forma_pago : $("#select-forma-pago").val(),
-        fecha_inicio : $("#input-fecha-inicio").val()
-    }
 }
 
 function mostrarInteres(){
