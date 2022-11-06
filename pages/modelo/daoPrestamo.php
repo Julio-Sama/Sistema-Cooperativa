@@ -16,8 +16,8 @@ if($_REQUEST['opcion'] == 'buscarSocio'){
     $id_destino = $_REQUEST['codigo_destino'];
     $resultado = [];
 
-    if(empty($id_destino)){
-        $resultado = ["Error :)", ""];
+    if(empty($id_destino) || $id_destino == 0){
+        $resultado = ["", ""];
     }else{
         $resultado = mostrarInteres($id_destino);
     }
@@ -26,13 +26,13 @@ if($_REQUEST['opcion'] == 'buscarSocio'){
 }else if($_REQUEST['opcion'] == 'calcularCuotas'){
     $resultado = [];
 
-    $monto = $_REQUEST['monto'];
+    $monto = doubleval($_REQUEST['monto']);
     $num_cuotas = $_REQUEST['num_cuotas'];
     $id_destino = $_REQUEST['id_destino'];
     $forma_pago = $_REQUEST['forma_pago'];
     $fecha_inicio = $_REQUEST['fecha_inicio'];
 
-    if(empty($monto) || empty($num_cuotas) || empty($id_destino) || empty($forma_pago) || empty($fecha_inicio)){
+    if(empty($monto) || empty($num_cuotas) ||  $id_destino == "0" || empty($forma_pago) || empty($fecha_inicio)){
         $resultado = ['error', 'Complete todos los campos'];
     }else{
         $resultado = calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio);
@@ -43,19 +43,110 @@ if($_REQUEST['opcion'] == 'buscarSocio'){
     $resultado = [];
 
     $id_socio = $_REQUEST['cod_socio'];
-    $monto = $_REQUEST['monto'];
+    $monto = doubleval($_REQUEST['monto']);
     $num_cuotas = $_REQUEST['num_cuotas'];
     $id_destino = $_REQUEST['id_destino'];
     $forma_pago = $_REQUEST['forma_pago'];
     $fecha_inicio = $_REQUEST['fecha_inicio'];
 
-    if(empty($id_socio) || empty($monto) || empty($num_cuotas) || empty($id_destino) || empty($forma_pago) || empty($fecha_inicio)){
+    if(empty($id_socio) || empty($monto) || empty($num_cuotas) || $id_destino == "0" || empty($forma_pago) || empty($fecha_inicio)){
         $resultado = ['error', 'Complete todos los campos'];
     }else{
         $resultado = registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio);
     }
 
     echo json_encode($resultado);
+}else if($_REQUEST['opcion'] == 'obtenerPlanDePagos'){
+    $resultado = [];
+
+    $id_prestamo = $_REQUEST['cod_prestamo'];
+
+    if(empty($id_prestamo)){
+        $resultado = ['error', 'Complete todos los campos'];
+    }else{
+        $resultado = obtenerPrestamo($id_prestamo);
+    }
+
+    echo json_encode($resultado);
+
+}
+
+function obtenerPrestamo($id_prestamo){
+    include_once '../modelo/conexion.php';
+    $conexion = conexionBaseDeDatos();
+    $resultado = [];
+
+    try{
+
+        $sql = "SELECT s.cod_socio, s.nombre_socio, s.apellido_socio,
+            (SELECT COUNT(*) FROM cuota 
+                    WHERE cuota.id_prestamo = p.id_prestamo) AS cant_cuota,
+            p.monto_prestamo, p.forma_pago_prestamo, d.nom_destino, d.interes_destino,
+            IF(
+                (SELECT COUNT(*) FROM cuota 
+                    WHERE cuota.id_prestamo = p.id_prestamo 
+                    AND cuota.estado_cuota = 'Pendiente') > 0, 'Pendiente', 'Cancelado') AS estado
+        FROM prestamo AS p
+        INNER JOIN socio AS s ON s.cod_socio = p.cod_socio
+        INNER JOIN destino AS d ON d.id_destino = p.id_destino 
+        WHERE p.id_prestamo = :id_prestamo";
+
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute(array(':id_prestamo' => $id_prestamo));
+
+        if($consulta->rowCount() > 0){
+            $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
+
+            $cuotas = obtenerCuotas($id_prestamo);
+
+            $resultado = [
+                $resultado['cod_socio'],
+                $resultado['nombre_socio'], 
+                $resultado['apellido_socio'], 
+                $resultado['cant_cuota'], 
+                number_format($resultado['monto_prestamo'], 2), 
+                $resultado['forma_pago_prestamo'], 
+                $resultado['nom_destino'], 
+                number_format($resultado['interes_destino'], 2), 
+                $resultado['estado'],
+                $cuotas
+            ];
+        }else{
+            $resultado = ['error', 'No se encontró el préstamo'];
+        }
+    }catch(PDOException $e){
+        $resultado = ['error :)', $e->getMessage()];
+    }
+
+    return $resultado;
+}
+
+function obtenerCuotas($id_prestamo){
+    include_once '../modelo/conexion.php';
+    $conexion = conexionBaseDeDatos();
+    $tabla_cuotas = "";
+
+    $sql = "SELECT * FROM cuota WHERE id_prestamo = :id_prestamo";
+
+    $consulta = $conexion->prepare($sql);
+    $consulta->execute(array(':id_prestamo' => $id_prestamo));
+
+    $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
+
+    $i = 1;
+
+    foreach($resultado as $cuota){
+        $tabla_cuotas .= "<tr>
+                            <td>$i</td>
+                            <td>{$cuota['fecha_pago_cuota']}</td>
+                            <td>$". number_format($cuota['monto_cuota'], 2)."</td>
+                            <td>{$cuota['estado_cuota']}</td>
+                        </tr>";
+
+        $i = $i + 1;
+    }
+
+    return $tabla_cuotas;
 }
 
 function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_pago, $fecha_inicio){
@@ -67,9 +158,9 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_p
 
     try{
         $sql = "SELECT * FROM destino WHERE id_destino = :id_destino";
-        $statement = $conexion->prepare($sql);
-        $statement->execute(array(":id_destino" => $id_destino));
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute(array(":id_destino" => $id_destino));
+        $result = $consulta->fetch(PDO::FETCH_ASSOC);
 
         $seguro = $monto * 0.058; // 5.8%
         $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
@@ -97,11 +188,11 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_p
             :forma_pago
         )";
 
-        $statement = $conexion->prepare($sql);
-        $statement->execute(array(
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute(array(
             ":cod_socio" => $id_socio,
             ":id_destino" => $id_destino,
-            ":monto" => $monto_total,
+            ":monto" => $monto,
             ":abono_capital" => 0,
             ":seguro" => $seguro,
             ":fecha_emision" => date('Y-m-d'),
@@ -112,7 +203,19 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_p
         $id_prestamo = $conexion->lastInsertId(); // Obtenemos el id del prestamo
 
         for($i = 0; $i < $num_cuotas; $i++){
-            $fecha = date("Y-m-d", strtotime($fecha_inicio . " + $i $forma_pago"));
+            $aux = $fecha_inicio . " + $i ";
+
+            if($forma_pago == 'Diario'){
+                $aux .= 'day';
+            }else if($forma_pago == 'Semanal'){
+                $aux .= 'week';
+            }else if($forma_pago == 'Quincenal'){
+                /* En desarrollo */
+            }else if($forma_pago == 'Mensual'){
+                $aux .= 'month';
+            }
+
+            $fecha = date('Y-m-d', strtotime($aux));
 
             $sql = "INSERT INTO cuota (
                 id_prestamo,
@@ -128,8 +231,8 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $forma_p
                 :estado
             )";
 
-            $statement = $conexion->prepare($sql);
-            $statement->execute(array(
+            $consulta = $conexion->prepare($sql);
+            $consulta->execute(array(
                 ":id_prestamo" => $id_prestamo,
                 ":fecha_pago" => $fecha,
                 ":monto_cuota" => $monto_cuota,
@@ -155,9 +258,9 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
 
     try{
         $sql = "SELECT * FROM destino WHERE id_destino = :id_destino";
-        $statement = $conexion->prepare($sql);
-        $statement->execute(array(":id_destino" => $id_destino));
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute(array(":id_destino" => $id_destino));
+        $result = $consulta->fetch(PDO::FETCH_ASSOC);
 
         $seguro = $monto * 0.058; // 5.8%
         $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
@@ -173,9 +276,7 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
             }else if($forma_pago == 'Semanal'){
                 $aux .= 'week';
             }else if($forma_pago == 'Quincenal'){
-                if(date('d', strtotime($fecha_inicio)) <= 15){
-                    $aux .= 'month';
-                }
+                /* En desarrollo */
             }else if($forma_pago == 'Mensual'){
                 $aux .= 'month';
             }
@@ -213,10 +314,10 @@ function mostrarInteres($id_destino){
 
     try{
         $sql = "SELECT * FROM destino WHERE id_destino = :id_destino";
-        $statement = $conexion->prepare($sql);
-        $statement->execute(array(":id_destino" => $id_destino));
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute(array(":id_destino" => $id_destino));
 
-        $resultado = $statement->fetch(PDO::FETCH_ASSOC);
+        $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
         
         if($resultado != null){
             $resultado = [number_format($resultado['interes_destino'], 2) . '%', ''];
@@ -237,10 +338,10 @@ function buscarSocio($busqueda){
 
     try{
         $sql = "SELECT * FROM socio WHERE cod_socio LIKE '%" .  $busqueda . "%' OR nombre_socio LIKE '%" .  $busqueda . "%' OR apellido_socio LIKE '%" .  $busqueda ."%' ORDER BY cod_socio DESC LIMIT 1";
-        $statement = $conexion->prepare($sql);
-        $statement->execute();
+        $consulta = $conexion->prepare($sql);
+        $consulta->execute();
 
-        $resultado = $statement->fetch(PDO::FETCH_ASSOC);
+        $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
 
         if($resultado != null){
             $resultado = [$resultado['cod_socio'], $resultado['nombre_socio'] . " " . $resultado['apellido_socio']];

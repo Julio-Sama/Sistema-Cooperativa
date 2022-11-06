@@ -2,7 +2,9 @@
 
     <div class="d-flex align-items-center justify-content-between py-3">
         <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Listado de Préstamos</h4>
-        <button class="btn btn-primary" type="button" onclick="window.location.href='?modulo=prestamos&nuevo=true'"><span class="tf-icons bx bx-plus-circle"></span> Nuevo</button>
+        <button class="btn btn-primary" type="button"
+            onclick="window.location.href='?modulo=prestamos&nuevo=true'"><span
+                class="tf-icons bx bx-plus-circle"></span> Nuevo</button>
     </div>
 
     <!-- Basic Bootstrap Table -->
@@ -22,32 +24,51 @@
                         <th class="th-sm">ID</th>
                         <th>Código socio</th>
                         <th>Socio</th>
-                        <th>Monto Inicial</th>
+                        <th>Monto</th>
                         <th>Fecha de Emisión</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="pagination-tabla" class="table-border-bottom-0">
-                    <?php 
+                    <?php
                         include_once '../modelo/conexion.php';
                         $conexion = conexionBaseDeDatos();
 
                         try{
-                            $sql = "SELECT * FROM prestamo INNER JOIN socio ON prestamo.cod_socio = socio.cod_socio";
-                            $statement = $conexion->prepare($sql);
-                            $statement->execute();
-                
-                            while($resultado = $statement->fetch(PDO::FETCH_ASSOC)){
-                                echo "<tr>";
-                                echo "<td>".$resultado['id_prestamo']."</td>";
-                                echo "<td>".$resultado['cod_socio']."</td>";
-                                echo "<td>".$resultado['nombre_socio']. " " . $resultado['apellido_socio'] ."</td>";
-                                echo "<td> $". number_format($resultado['monto_prestamo'], 2) ."</td>";
-                                echo "<td>".$resultado['fecha_emision_prestamo']."</td>";
-                                echo "<td><span class='badge bg-label-danger me-1'>Pendiente</span></td>";
-                                echo "<td><button class='btn btn-outline-info' type='button'><span class='tf-icons bx bx-show'></span> Ver pagos</td>";
-                                echo "</tr>";
+                            $sql = "SELECT p.id_prestamo, p.fecha_emision_prestamo, s.cod_socio, s.nombre_socio, s.apellido_socio,
+                                        p.monto_prestamo,
+                                        IF(
+                                            (SELECT COUNT(*) FROM cuota 
+                                                WHERE cuota.id_prestamo = p.id_prestamo 
+                                                AND cuota.estado_cuota = 'Pendiente') > 0, 'Pendiente', 'Cancelado') AS estado
+                                    FROM prestamo AS p
+                                    INNER JOIN socio AS s ON s.cod_socio = p.cod_socio
+                                    INNER JOIN destino AS d ON d.id_destino = p.id_destino
+                                    ORDER BY p.id_prestamo ASC";
+                            $consulta = $conexion->prepare($sql);
+                            $consulta->execute();
+
+                            if($consulta->rowCount() <= 0){
+                                echo "<tr><td colspan='7' class='text-center'>No hay datos para mostrar</td></tr>";
+                            }else{
+                                while($resultado = $consulta->fetch(PDO::FETCH_ASSOC)){
+                                    echo "<tr>";
+                                    echo "<td>".$resultado['id_prestamo']."</td>";
+                                    echo "<td>".$resultado['cod_socio']."</td>";
+                                    echo "<td>".$resultado['nombre_socio']. " " . $resultado['apellido_socio'] ."</td>";
+                                    echo "<td> $". number_format($resultado['monto_prestamo'], 2) ."</td>";
+                                    echo "<td>". date('d-m-Y', strtotime($resultado['fecha_emision_prestamo'])) ."</td>";
+
+                                    if($resultado['estado'] == 'Pendiente'){
+                                        echo "<td><span class='badge rounded-pill bg-danger'>Pendiente</span></td>";
+                                    }else{
+                                        echo "<td><span class='badge rounded-pill bg-success'>Cancelado</span></td>";
+                                    }
+
+                                    echo "<td><button class='btn btn-outline-info' type='button' onclick='mostrarPlanDePagos(". $resultado['id_prestamo'] .")' data-bs-toggle='modal' data-bs-target='#modalPlandePagos'><span class='tf-icons bx bx-show'></span> Ver pagos</td>";
+                                    echo "</tr>";
+                                }
                             }
 
                         }catch(PDOException $e){
@@ -56,6 +77,83 @@
                     ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal plan de pagos -->
+<div class="modal fade" id="modalPlandePagos" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="text-nowrap mb-3">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Plan de pagos</h5>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            Código de socio: <span id="cod-socio-plan"></span>
+                        </div>
+                        <div class="col-md-6">
+                            Nombre: <span id="nombre-socio-plan"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            Número de cuotas: <span id="numero-cuotas-plan"></span>
+                        </div>
+                        <div class="col-md-6">
+                            Monto: <span id="monto-plan"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            Forma de pago: <span id="forma-pago-plan"></span>
+                        </div>
+                        <div class="col-md-6">
+                            Destino: <span id="destino-plan"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            Interés: <span id="interes-plan"></span>
+                        </div>
+                        <div class="col-md-6">
+                            Estado del préstamo: <span id="estado-plan"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-responsive">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabla-plan-pagos">
+                        <tr>
+                            <td colspan="4" class="text-center">No hay datos</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary"><i class="bx bx-printer"></i> Imprimir</button>
+            </div>
         </div>
     </div>
 </div>

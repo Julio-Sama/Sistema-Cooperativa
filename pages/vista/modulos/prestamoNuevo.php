@@ -1,9 +1,9 @@
-<form>
+<form autocomplete="off">
     <div class="container-xxl flex-grow-1">
         <div class="d-flex align-items-center justify-content-between py-3">
             <h4 class="fw-bold py-1 m-0"><span class="text-muted fw-light">Préstamos /</span> Nuevo préstamo</h4>
             <div>
-                <button type="button" class="btn btn-primary" id="btn-reg-prestamo" onclick="registrarPrestamo()">Registrar préstamo</button>
+                <button type="button" class="btn btn-primary" id="btn-reg-prestamo" onclick="registrarPrestamo()" disabled>Registrar préstamo</button>
                 <button type="button" class="btn btn-outline-danger" id="btn-cancel-prestamo" onclick="window.location.href='controlPanel.php?modulo=prestamos'">Cancelar</button>
             </div>
         </div>
@@ -49,17 +49,17 @@
                             <label class="form-label" for="input-monto-prestamo">Monto</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-prestamo" type="text" class="form-control" placeholder="0.00" />
+                                <input id="input-monto-prestamo" type="text" class="form-control" placeholder="0.00" onkeypress="return filterFloat(event,this);"/>
                             </div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="input-num-cuotas">N° de cuotas</label>
-                            <input type="number" class="form-control" id="input-num-cuotas" placeholder="0" />
+                            <input type="number"min="5" class="form-control" id="input-num-cuotas" placeholder="0" />
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="select-destino">Destino</label>
                             <select class="form-select" id="select-destino" aria-label="Default select example" onchange="mostrarInteres()">
-                                <option selected>Seleccione</option>
+                                <option value="0" selected>Seleccione</option>
                                 <?php 
                                     include_once '../modelo/conexion.php';
                                     $pdo = conexionBaseDeDatos();
