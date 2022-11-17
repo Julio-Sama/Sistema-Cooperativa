@@ -83,17 +83,14 @@
 
 <!-- Modal plan de pagos -->
 <div class="modal fade" id="modalPlandePagos" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Plan de pagos</h5>
+            </div>
 
             <div class="modal-body">
                 <div class="text-nowrap mb-3">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5>Plan de pagos</h5>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6">
                             Código de socio: <span id="cod-socio-plan"></span>
@@ -131,7 +128,7 @@
                     </div>
                 </div>
 
-                <table class="table table-responsive">
+                <table class="table table-responsive-lg ">
                     <thead>
                         <tr class="text-nowrap">
                             <th>#</th>
@@ -150,9 +147,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    Close
+                    Cerrar
                 </button>
-                <button type="button" class="btn btn-primary"><i class="bx bx-printer"></i> Imprimir</button>
+                <button type="button" class="btn btn-primary"><i class="bx bx-file"></i> Generar PDF</button>
             </div>
         </div>
     </div>

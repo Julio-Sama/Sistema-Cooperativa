@@ -138,7 +138,7 @@ function obtenerCuotas($id_prestamo){
     foreach($resultado as $cuota){
         $tabla_cuotas .= "<tr>
                             <td>$i</td>
-                            <td>{$cuota['fecha_pago_cuota']}</td>
+                            <td>" . date('d-m-Y', strtotime($cuota['fecha_pago_cuota'])) . "</td>
                             <td>$". number_format($cuota['monto_cuota'], 2)."</td>
                             <td>{$cuota['estado_cuota']}</td>
                         </tr>";
