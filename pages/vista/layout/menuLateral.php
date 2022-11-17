@@ -93,8 +93,8 @@
             </a>
         </li>
 
-        <li class="menu-item">
-            <a href="index.html" class="menu-link">
+        <li class="menu-item <?php echo (isset($_GET['modulo']) && $_GET['modulo'] == 'cuotas') ? 'active' : ''; ?>">
+            <a href="?modulo=cuotas" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-coin-stack"></i>
                 <div data-i18n="Analytics">Cuotas</div>
             </a>
@@ -112,9 +112,26 @@
         </li>
 
         <li class="menu-item">
-            <a href="index.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-cog"></i>
-                <div data-i18n="Analytics">Configuración</div>
+            <a href="?modulo=configuracion" class="menu-link">
+            <div class="btn-group">
+                              <button
+                                class="btn btn-primary dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                              >
+                                Dropdown
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="javascript:void(0);">Action</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0);">Another action</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0);">Something else here</a></li>
+                                <li>
+                                  <hr class="dropdown-divider" />
+                                </li>
+                                <li><a class="dropdown-item" href="javascript:void(0);">Separated link</a></li>
+                              </ul>
+                            </div>
             </a>
         </li>
     </ul>

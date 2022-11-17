@@ -90,7 +90,10 @@ include_once '../vista/titulo.php';
                   include_once 'modulos/prestamo.php';
                 }
                 
-              }  
+              }else if(isset($_GET['modulo']) && $_GET['modulo'] == 'cuotas'){
+                include_once 'modulos/cuotasMessage.php';
+                // inlcude_once 'modulos/cuotas.php';
+              }
             ?>
 
             <!-- / Content -->
