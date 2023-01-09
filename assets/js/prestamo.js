@@ -12,7 +12,6 @@ function registrarPrestamo(){
         monto : $("#input-monto-prestamo").val(),
         num_cuotas : $("#input-num-cuotas").val(),
         id_destino : $("#select-destino").val(),
-        forma_pago : $("#select-forma-pago").val(),
         fecha_inicio : $("#input-fecha-inicio").val()
     }
 
@@ -22,8 +21,8 @@ function registrarPrestamo(){
         type: 'post',
         dataType: 'json',
 
-        error: function (thrownError) {
-            mostrarMensaje("Error", thrownError, "error");
+        error: function (thrownMessage) {
+            mostrarMensaje("Error", thrownMessage, "error");
         },
 
         
@@ -43,6 +42,7 @@ function registrarPrestamo(){
     })
 }
 
+/* Mostrar el plan de pagos */
 function mostrarPlanDePagos(id_prestamo){
     var parametros = {
         opcion : "obtenerPlanDePagos",
@@ -126,6 +126,28 @@ function mostrarInteres(){
 
         success: function (respuesta) {
             $("#input-interes").val(respuesta[0]);
+        }
+    });
+}
+
+function mostrarDestinos(){
+    var parametros = {
+        opcion : "obtenerDestinos",
+        id_forma_pago : $("#select-forma-pago").val()
+    }
+
+    $.ajax({
+        data: parametros,
+        url: '../../pages/modelo/daoPrestamo.php',
+        type: 'post',
+        dataType: 'json',
+        error: function (thrownError) {
+            mostrarMensaje("Error", thrownError, "error");
+        },
+
+        success: function (respuesta) {
+            $("#select-destino").html(respuesta);
+            $("#select-destino").prop("disabled", false);
         }
     });
 }

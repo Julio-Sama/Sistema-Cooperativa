@@ -5,7 +5,7 @@ function conexionBaseDeDatos(){
 	$password = '';
 
     try{
-        $connection = "mysql:host=localhost;dbname=bd_coopertiva";
+        $connection = "mysql:host=localhost;dbname=bd_cooperativa";
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES   => false,

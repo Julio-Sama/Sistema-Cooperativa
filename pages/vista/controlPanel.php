@@ -90,7 +90,7 @@ include_once '../vista/titulo.php';
                   include_once 'modulos/prestamo.php';
                 }
                 
-              }  
+              }
             ?>
 
             <!-- / Content -->

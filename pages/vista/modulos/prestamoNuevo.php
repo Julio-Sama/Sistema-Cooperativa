@@ -45,54 +45,56 @@
             <div class="col-md-8 mt-4">
                 <div class="card p-4">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label" for="input-monto-prestamo">Monto</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
                                 <input id="input-monto-prestamo" type="text" class="form-control" placeholder="0.00" onkeypress="return filterFloat(event,this);"/>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label" for="input-num-cuotas">N° de cuotas</label>
                             <input type="number"min="5" class="form-control" id="input-num-cuotas" placeholder="0" />
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="select-destino">Destino</label>
-                            <select class="form-select" id="select-destino" aria-label="Default select example" onchange="mostrarInteres()">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="select-forma-pago">Forma de Pago</label>
+                            <select class="form-select" id="select-forma-pago" onchange="mostrarDestinos()">
                                 <option value="0" selected>Seleccione</option>
                                 <?php 
+
                                     include_once '../modelo/conexion.php';
                                     $pdo = conexionBaseDeDatos();
-                                    $sql = "SELECT * FROM destino";
+                                    $sql = "SELECT DISTINCT fp.id_forma_pago, fp.nom_forma_pago FROM forma_pago AS fp
+                                                INNER JOIN destino AS d ON fp.id_forma_pago = d.id_forma_pago
+                                                WHERE d.estado_destino = 1";
                                     $query = $pdo->prepare($sql);
                                     $query->execute();
 
                                     $resultado = $query->fetchAll();
-                                    
+
                                     foreach($resultado as $dato){ //Recorremos el array de datos
-                                        echo '<option value="'.$dato['id_destino'].'">'.$dato['nom_destino'].'</option>';
+                                        echo '<option value="'.$dato['id_forma_pago'].'">'.$dato['nom_forma_pago'].'</option>';
                                     }
-                                ?>
+
+                                ?>  
                             </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-interes">Tasa de Interés (%)</label>
-                            <input type="text" class="form-control" value="" id="input-interes" placeholder="0.00%" disabled />
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label" for="select-forma-pago">Forma de Pago</label>
-                            <select class="form-select" id="select-forma-pago" aria-label="Default select example">
-                                <option selected>Seleccione</option>
-                                <option value="Diario">Diario</option>
-                                <option value="Semanal">Semanal</option>
-                                <option value="Quincenal">Quincenal</option>
-                                <option value="Mensual">Mensual</option>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="select-destino">Destino</label>
+                            <select class="form-select" id="select-destino" disabled onchange="mostrarInteres()">
+
                             </select>
                         </div>
-                        <div class="col-md-5 mb-3">
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="input-interes">Tasa de Interés (%)</label>
+                            <input type="text" class="form-control" value="" id="input-interes" placeholder="0.00%" disabled />
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
                             <label class="form-label" for="input-fecha-inicio">Fecha de inicio</label>
                             <input type="date" class="form-control" id="input-fecha-inicio" required pattern="\d{4}-\d{2}-\d{2}"/>
                         </div>
@@ -140,7 +142,6 @@
                             </div>
                         </div>
 
-                        
                     </div>
                 </div>
             </div>
@@ -155,12 +156,13 @@
                                         <th>#</th>
                                         <th>Fecha</th>
                                         <th>Monto</th>
+                                        <th>Interés</th>
                                     </tr>
                                 </thead>
 
                                 <tbody id="tabla-cuotas">
                                     <tr>
-                                        <td colspan="3" class="text-center">No hay datos</td>
+                                        <td colspan="4" class="text-center">No hay datos</td>
                                     </tr>
                                 </tbody>
                             </table>
