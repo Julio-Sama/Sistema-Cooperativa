@@ -134,6 +134,7 @@
                             <th>#</th>
                             <th>Fecha</th>
                             <th>Monto</th>
+                            <th>Interés</th>
                             <th>Estado</th>
                         </tr>
                     </thead>

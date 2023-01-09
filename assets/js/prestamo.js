@@ -12,7 +12,8 @@ function registrarPrestamo(){
         monto : $("#input-monto-prestamo").val(),
         num_cuotas : $("#input-num-cuotas").val(),
         id_destino : $("#select-destino").val(),
-        fecha_inicio : $("#input-fecha-inicio").val()
+        fecha_inicio : $("#input-fecha-inicio").val(),
+        forma_pago : $("#select-forma-pago").val()
     }
 
     $.ajax({

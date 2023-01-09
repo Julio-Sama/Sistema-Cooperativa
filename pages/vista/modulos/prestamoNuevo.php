@@ -95,8 +95,9 @@
                         </div>
                         
                         <div class="col-md-3 mb-3">
+                            
                             <label class="form-label" for="input-fecha-inicio">Fecha de inicio</label>
-                            <input type="date" class="form-control" id="input-fecha-inicio" required pattern="\d{4}-\d{2}-\d{2}"/>
+                            <input type="date" class="form-control" id="input-fecha-inicio" min="today" required pattern="\d{4}-\d{2}-\d{2}"/>
                         </div>
 
                         <div class="col-md-3 mb-3">

@@ -47,11 +47,12 @@ if($_REQUEST['opcion'] == 'buscarSocio'){
     $num_cuotas = $_REQUEST['num_cuotas'];
     $id_destino = $_REQUEST['id_destino'];
     $fecha_inicio = $_REQUEST['fecha_inicio'];
+    $forma_pago = $_REQUEST['forma_pago'];
 
-    if(empty($id_socio) || empty($monto) || empty($num_cuotas) || $id_destino == "0" || empty($fecha_inicio)){
+    if(empty($id_socio) || empty($monto) || empty($num_cuotas) || $id_destino == "0" || empty($fecha_inicio) || empty($forma_pago)){
         $resultado = ['error', 'Complete todos los campos'];
     }else{
-        $resultado = registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_inicio);
+        $resultado = registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_inicio, $forma_pago);
     }
 
     echo json_encode($resultado);
@@ -93,14 +94,15 @@ function obtenerPrestamo($id_prestamo){
         $sql = "SELECT s.cod_socio, s.nombre_socio, s.apellido_socio,
             (SELECT COUNT(*) FROM cuota 
                     WHERE cuota.id_prestamo = p.id_prestamo) AS cant_cuota,
-            p.monto_prestamo, p.forma_pago_prestamo, d.nom_destino, d.interes_destino,
+            p.monto_prestamo, fp.nom_forma_pago, d.nom_destino, d.interes_destino,
             IF(
                 (SELECT COUNT(*) FROM cuota 
                     WHERE cuota.id_prestamo = p.id_prestamo 
                     AND cuota.estado_cuota = 'Pendiente') > 0, 'Pendiente', 'Cancelado') AS estado
         FROM prestamo AS p
         INNER JOIN socio AS s ON s.cod_socio = p.cod_socio
-        INNER JOIN destino AS d ON d.id_destino = p.id_destino 
+        INNER JOIN destino AS d ON d.id_destino = p.id_destino
+        INNER JOIN forma_pago AS fp ON fp.id_forma_pago = d.id_forma_pago
         WHERE p.id_prestamo = :id_prestamo";
 
         $consulta = $conexion->prepare($sql);
@@ -117,7 +119,7 @@ function obtenerPrestamo($id_prestamo){
                 $resultado['apellido_socio'], 
                 $resultado['cant_cuota'], 
                 number_format($resultado['monto_prestamo'], 2), 
-                $resultado['forma_pago_prestamo'], 
+                $resultado['nom_forma_pago'], 
                 $resultado['nom_destino'], 
                 number_format($resultado['interes_destino'], 2), 
                 $resultado['estado'],
@@ -152,6 +154,7 @@ function obtenerCuotas($id_prestamo){
                             <td>$i</td>
                             <td>" . date('d-m-Y', strtotime($cuota['fecha_pago_cuota'])) . "</td>
                             <td>$". number_format($cuota['monto_cuota'], 2)."</td>
+                            <td>$". number_format($cuota['interes_cuota'], 2)."</td>
                             <td>{$cuota['estado_cuota']}</td>
                         </tr>";
 
@@ -161,7 +164,7 @@ function obtenerCuotas($id_prestamo){
     return $tabla_cuotas;
 }
 
-function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_inicio){
+function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_inicio, $forma_pago){
     include_once '../modelo/conexion.php';
     $conexion = conexionBaseDeDatos();
     $resultado = null;
@@ -171,16 +174,16 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_i
     try{
         /* Obtener el porcentaje de interes */
         $sql = "SELECT * FROM destino WHERE id_destino = :id_destino";
+
         $consulta = $conexion->prepare($sql);
         $consulta->execute(array(":id_destino" => $id_destino));
         $result = $consulta->fetch(PDO::FETCH_ASSOC);
-        $forma_pago = $result['forma_pago_destino'];
 
         $seguro = $monto * 0.058; // 5.8%
-        $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
+        $interes = 0; // Interes del destino
 
-        $interes_cuota = ($monto * (((1 + $interes) ^ $num_cuotas) - 1)) / $num_cuotas; // Monto de cada cuota
-        $monto_cuota = $monto / $num_cuotas; // Monto de cada cuota
+        $interes_cuota = 0; // Monto de cada cuota
+        $monto_cuota = 0; // Monto de cada cuota
 
         $sql = "INSERT INTO prestamo (
             cod_socio,
@@ -211,23 +214,6 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_i
         $id_prestamo = $conexion->lastInsertId(); // Obtenemos el id del prestamo
 
         for($i = 0; $i < $num_cuotas; $i++){
-            $aux = $fecha_inicio . " + $i ";
-
-            if($forma_pago == 'Diario'){
-                $aux .= 'day';
-            }else if($forma_pago == 'Semanal'){
-                $aux .= 'week';
-            }else if($forma_pago == 'Quincenal'){
-                $aux .= '15 day';
-            }else if($forma_pago == 'Mensual'){
-                $aux .= 'month';
-            }
-
-            $fecha = date('Y-m-d', strtotime($aux));
-
-            if(date('D', strtotime($fecha)) == 'Sun'){
-                $fecha = date('Y-m-d', strtotime($fecha . ' + 1 day'));
-            }
 
             $sql = "INSERT INTO cuota (
                 id_prestamo,
@@ -248,7 +234,7 @@ function registrarPrestamo($id_socio, $monto, $num_cuotas, $id_destino, $fecha_i
             $consulta = $conexion->prepare($sql);
             $consulta->execute(array(
                 ":id_prestamo" => $id_prestamo,
-                ":fecha_pago" => $fecha,
+                ":fecha_pago" => obtenerFechaPago($fecha_inicio, $forma_pago, $i),
                 ":monto_cuota" => $monto_cuota,
                 ":interes_cuota" => $interes_cuota,
                 ":extra_cuota" => 0,
@@ -279,15 +265,17 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
         $result = $consulta->fetch(PDO::FETCH_ASSOC);
 
         $seguro = $monto * 0.058; // 5.8%
-        $interes = $monto * ($result['interes_destino'] / 100); // Interes del destino
+        $interes = 0; // Interes del destino
 
-        $interes_cuota = ($monto * (((1 + $interes) ^ $num_cuotas) - 1)) / $num_cuotas; // Monto de cada cuota
-        $monto_cuota = $monto / $num_cuotas; // Monto de cada cuota
+        $interes_cuota = 0; // Monto de cada cuota
+        $monto_cuota = 0; // Monto de cada cuota
 
         for($i = 0; $i < $num_cuotas; $i++){
+            $fecha_pago = new DateTime(obtenerFechaPago($fecha_inicio, $forma_pago, $i));
+
             $tabla_cuotas .= "<tr>
-                                <td>".($i)."</td>
-                                <td>" . obtenerFechaPago($fecha_inicio, $forma_pago, $i) . "</td>
+                                <td>".($i + 1)."</td>
+                                <td>" . $fecha_pago->format('d-m-Y') . "</td>
                                 <td>$ " . number_format($monto_cuota, 2) . "</td>
                                 <td>$ " . number_format($interes_cuota, 2) . "</td>
                             </tr>";
@@ -327,16 +315,16 @@ function obtenerFechaPago($fecha_inicio, $forma_pago, $cuotas) {
     $fecha = new DateTime($fecha_inicio);
 
     switch ($forma_pago) {
-        case '1':
+        case '1': /* Diario */
             return obtenerDia($fecha_inicio, $cuotas);
-        case '2':
+        case '2': /* Semanal */
             $fecha->modify("+$cuotas week");
             break;
-        case '3':
+        case '3': /* Quincenal */
             $dias = $cuotas * 14;
             $fecha->modify("+$dias day");
             break;
-        case '4':
+        case '4': /* Mensual */
             $fecha->modify("+$cuotas month");
             break;
     }
@@ -345,7 +333,7 @@ function obtenerFechaPago($fecha_inicio, $forma_pago, $cuotas) {
         $fecha->modify('+1 day');
     }
 
-    return $fecha->format('d-m-Y');
+    return $fecha->format('Y-m-d');
 }
 
 function mostrarInteres($id_destino){
