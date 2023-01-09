@@ -57,7 +57,7 @@
                             <input type="number"min="5" class="form-control" id="input-num-cuotas" placeholder="0" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label" for="select-forma-pago">Forma de Pago</label>
+                            <label class="form-label" for="select-forma-pago">Frecuencia de Pago</label>
                             <select class="form-select" id="select-forma-pago" onchange="mostrarDestinos()">
                                 <option value="0" selected>Seleccione</option>
                                 <?php 
