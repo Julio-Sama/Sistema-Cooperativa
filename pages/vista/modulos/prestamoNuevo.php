@@ -85,7 +85,7 @@
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="select-destino">Destino</label>
                             <select class="form-select" id="select-destino" disabled onchange="mostrarInteres()">
-
+                                <option value="0" selected>Seleccione</option>
                             </select>
                         </div>
 

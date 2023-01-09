@@ -136,20 +136,29 @@ function mostrarDestinos(){
         id_forma_pago : $("#select-forma-pago").val()
     }
 
-    $.ajax({
-        data: parametros,
-        url: '../../pages/modelo/daoPrestamo.php',
-        type: 'post',
-        dataType: 'json',
-        error: function (thrownError) {
-            mostrarMensaje("Error", thrownError, "error");
-        },
+    if(parametros.id_forma_pago == '0'){
+        $("#select-destino").prop("disabled", true);
+        $("#select-destino").html("<option value='0'>Seleccione</option>");
+        $("#input-interes").val("");
+    }else{
+        $.ajax({
+            data: parametros,
+            url: '../../pages/modelo/daoPrestamo.php',
+            type: 'post',
+            dataType: 'json',
+            error: function (thrownError) {
+                mostrarMensaje("Error", thrownError, "error");
+            },
 
-        success: function (respuesta) {
-            $("#select-destino").html(respuesta);
-            $("#select-destino").prop("disabled", false);
-        }
-    });
+            success: function (respuesta) {
+                $("#select-destino").html(respuesta);
+                $("#select-destino").prop("disabled", false);
+                $("#input-interes").val("");
+            }
+        });
+    }
+
+    
 }
 
 /* funcion buscar el socio en tiempo real */

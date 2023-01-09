@@ -284,29 +284,12 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
         $interes_cuota = ($monto * (((1 + $interes) ^ $num_cuotas) - 1)) / $num_cuotas; // Monto de cada cuota
         $monto_cuota = $monto / $num_cuotas; // Monto de cada cuota
 
-        for($i = 1; $i <= $num_cuotas; $i++){
-            $aux = $fecha_inicio . " + $i ";
-
-            if($forma_pago == 'Diario'){
-                $aux .= 'day';
-            }else if($forma_pago == 'Semanal'){
-                $aux .= 'week';
-            }else if($forma_pago == 'Quincenal'){
-                $aux .= '15 day';
-            }else if($forma_pago == 'Mensual'){
-                $aux .= 'month';
-            }
-
-            $fecha = date('Y-m-d', strtotime($aux));
-
-            if(date('D', strtotime($fecha)) == 'Sun'){
-                $fecha = date('Y-m-d', strtotime($fecha . ' + 1 day'));
-            }
-
+        for($i = 0; $i < $num_cuotas; $i++){
             $tabla_cuotas .= "<tr>
                                 <td>".($i)."</td>
-                                <td>" . $fecha . "</td>
+                                <td>" . obtenerFechaPago($fecha_inicio, $forma_pago, $i) . "</td>
                                 <td>$ " . number_format($monto_cuota, 2) . "</td>
+                                <td>$ " . number_format($interes_cuota, 2) . "</td>
                             </tr>";
         }
 
@@ -324,6 +307,45 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
 
     return $resultado;
 
+}
+
+function obtenerDia($fecha_inicio, $cuotas) {
+    $fecha = new DateTime($fecha_inicio);
+    
+    while ($cuotas > 0) {
+        $fecha->modify('+1 day');
+
+        if ($fecha->format('N') < 7) {  // 7 es domingo
+            $cuotas--;
+        }
+    }
+
+    return $fecha->format('d-m-Y');
+}
+  
+function obtenerFechaPago($fecha_inicio, $forma_pago, $cuotas) {
+    $fecha = new DateTime($fecha_inicio);
+
+    switch ($forma_pago) {
+        case '1':
+            return obtenerDia($fecha_inicio, $cuotas);
+        case '2':
+            $fecha->modify("+$cuotas week");
+            break;
+        case '3':
+            $dias = $cuotas * 14;
+            $fecha->modify("+$dias day");
+            break;
+        case '4':
+            $fecha->modify("+$cuotas month");
+            break;
+    }
+
+    if($fecha->format('N') == 7){
+        $fecha->modify('+1 day');
+    }
+
+    return $fecha->format('d-m-Y');
 }
 
 function mostrarInteres($id_destino){
