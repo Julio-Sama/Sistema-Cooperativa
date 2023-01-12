@@ -110,7 +110,13 @@ function obtenerPrestamo($id_prestamo){
         if($consulta->rowCount() > 0){
             $resultado = $consulta->fetch(PDO::FETCH_ASSOC);
 
-            $cuotas = obtenerCuotas($id_prestamo, $resultado['seguro_prestamo']);
+            $seguro = $resultado['seguro_prestamo'];
+            $monto = $resultado['monto_prestamo'];
+            $interes = $resultado['interes_destino'];
+            $num_cuotas = $resultado['cant_cuota'];
+            $frecuencia_de_pago = $resultado['frecuencia_pago_prestamo'];
+
+            $cuotas = obtenerCuotas($id_prestamo, $seguro, $monto, $interes, $num_cuotas, $frecuencia_de_pago);
 
             $resultado = [
                 $resultado['cod_socio'],
@@ -134,7 +140,7 @@ function obtenerPrestamo($id_prestamo){
     return $resultado;
 }
 
-function obtenerCuotas($id_prestamo, $seguro_total){
+function obtenerCuotas($id_prestamo, $seguro_total, $monto, $tasa, $num_cuotas, $frecuencia_de_pago){
     include_once '../modelo/conexion.php';
     $conexion = conexionBaseDeDatos();
     $tabla_cuotas = "";
@@ -147,10 +153,12 @@ function obtenerCuotas($id_prestamo, $seguro_total){
     $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
     $i = 1;
-    $seguro_cuota = $seguro_total / count($resultado);
+    $tasa = obtenerInteres($tasa, obtenerFrecuenciaPago($frecuencia_de_pago));
+    $total_cuota = obtenerCuota($monto, $tasa, $num_cuotas);
+    $seguro_cuota = $seguro_total / $num_cuotas;
+    $total_cuota = $total_cuota + $seguro_cuota;
 
     foreach($resultado as $cuota){
-        $total_cuota = $cuota['capital_cuota'] + $cuota['interes_cuota'] + $seguro_cuota;
 
         $tabla_cuotas .= "<tr>
                             <td>$i</td>
@@ -275,6 +283,10 @@ function obtenerFrecuenciaPago($id_frecuencia_pago){
         case 2: return "Semanal"; break;
         case 3: return "Quincenal"; break;
         case 4: return "Mensual"; break;
+        case 'Diario': return 1; break;
+        case 'Semanal': return 2; break;
+        case 'Quincenal': return 3; break;
+        case 'Mensual': return 4; break;
     }
 }
 
@@ -304,7 +316,7 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
 
         $interes_destino = obtenerInteres($fila['interes_destino'], $forma_pago); // Interes del destino segun la frecuencia de pago
 
-        $total_cuota = ($monto * $interes_destino) / (1 - pow(1 + $interes_destino, -$num_cuotas)); // Monto de cada cuota
+        $total_cuota = obtenerCuota($monto, $interes_destino, $num_cuotas); // Monto de cada cuota
         $seguro_cuota = $seguro_prestamo / $num_cuotas; // Seguro de cada cuota
 
         $aux_total_cuota = $total_cuota + $seguro_cuota; // Monto de cada cuota
@@ -345,6 +357,10 @@ function calcularCuotas($monto, $num_cuotas, $id_destino, $forma_pago, $fecha_in
 
     return $resultado;
 
+}
+
+function obtenerCuota($monto, $tasa, $n){
+    return ($monto * $tasa) / (1 - pow(1 + $tasa, -$n));
 }
 
 function obtenerInteres($interes, $forma_pago){
