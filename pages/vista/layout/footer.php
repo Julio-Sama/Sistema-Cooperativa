@@ -6,7 +6,7 @@
                 document.write(new Date().getFullYear());
             </script>
             - 
-            Cooperativa Don Teco.
+            <?php echo $_SESSION['nom_asoc']; ?>
         </div>
     </div>
 </footer>

@@ -33,7 +33,10 @@
 
             if($resultado){
                 $_SESSION['autenticado'] = true;
+                
                 $_SESSION['id'] = $resultado['id_config'];
+                $_SESSION['nom_asoc'] = $resultado['nom_asociacion'];
+                $_SESSION['usuario_conf'] = $resultado['usuario_config'];
                 
                 $mensaje = ["success", "Credenciales correctas"];
             }else{

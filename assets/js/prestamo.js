@@ -1,6 +1,10 @@
 $(document).ready(function (){  
 	$("#input-monto-prestamo, #input-num-cuotas, #select-destino, #select-forma-pago, #input-fecha-inicio").change(function () {   
         $("#btn-reg-prestamo").attr("disabled", true);
+        $("#tabla-cuotas").html("<tr><td colspan='7' class='text-center'>No hay datos para mostrar</td></tr>");
+        $("#input-total-seguro").val("");
+        $("#input-total-interes").val("");
+        $("#input-total-pagar").val("");
 	}); 
 }); /* Validación por cambios en el formulario de registro */
 
@@ -97,11 +101,10 @@ function calcularCuotas(){
             if(respuesta[0] == "error"){
                 mostrarMensaje("Error", respuesta[1], "error");
             }else{
-                $("#input-monto-cuota").val(respuesta[0]);
-                $("#input-monto-interes").val(respuesta[1]);
-                $("#input-seguro-prestamo").val(respuesta[2]);
-                $("#input-monto-total").val(respuesta[3]);
-                $("#tabla-cuotas").html(respuesta[4]);
+                $("#input-total-seguro").val(respuesta[0]);
+                $("#input-total-interes").val(respuesta[1]);
+                $("#input-total-pagar").val(respuesta[2]);
+                $("#tabla-cuotas").html(respuesta[3]);
                 
                 $("#btn-reg-prestamo").attr("disabled", false);
             }
@@ -129,37 +132,6 @@ function mostrarInteres(){
             $("#input-interes").val(respuesta[0]);
         }
     });
-}
-
-function mostrarDestinos(){
-    var parametros = {
-        opcion : "obtenerDestinos",
-        id_forma_pago : $("#select-forma-pago").val()
-    }
-
-    if(parametros.id_forma_pago == '0'){
-        $("#select-destino").prop("disabled", true);
-        $("#select-destino").html("<option value='0'>Seleccione</option>");
-        $("#input-interes").val("");
-    }else{
-        $.ajax({
-            data: parametros,
-            url: '../../pages/modelo/daoPrestamo.php',
-            type: 'post',
-            dataType: 'json',
-            error: function (thrownError) {
-                mostrarMensaje("Error", thrownError, "error");
-            },
-
-            success: function (respuesta) {
-                $("#select-destino").html(respuesta);
-                $("#select-destino").prop("disabled", false);
-                $("#input-interes").val("");
-            }
-        });
-    }
-
-    
 }
 
 /* funcion buscar el socio en tiempo real */

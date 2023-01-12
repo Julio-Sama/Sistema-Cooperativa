@@ -83,7 +83,7 @@
 
 <!-- Modal plan de pagos -->
 <div class="modal fade" id="modalPlandePagos" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Plan de pagos</h5>
@@ -111,7 +111,7 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            Forma de pago: <span id="forma-pago-plan"></span>
+                            Frecuencia de pago: <span id="forma-pago-plan"></span>
                         </div>
                         <div class="col-md-6">
                             Destino: <span id="destino-plan"></span>
@@ -128,20 +128,23 @@
                     </div>
                 </div>
 
-                <table class="table table-responsive-lg ">
+                <table class="table table-responsive-lg">
                     <thead>
                         <tr class="text-nowrap">
                             <th>#</th>
                             <th>Fecha</th>
-                            <th>Monto</th>
+                            <th>Capital</th>
                             <th>Interés</th>
+                            <th>Seguro</th>
+                            <th>Total cuota</th>
+                            <th>Saldo capital</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
 
                     <tbody id="tabla-plan-pagos">
                         <tr>
-                            <td colspan="4" class="text-center">No hay datos</td>
+                            <td colspan="7" class="text-center">No hay datos</td>
                         </tr>
                     </tbody>
                 </table>

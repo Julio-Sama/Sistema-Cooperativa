@@ -11,8 +11,12 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card p-4">
+                    <div>
+                        <h5 class="fw-bold">Datos del socio</h5>
+                        <hr>
+                    </div>
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label" for="input-buscar-socio">Buscar socio</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text" id="basic-addon-search31"><i
@@ -23,27 +27,33 @@
                                     aria-describedby="basic-addon-search31" autofocus/>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label" for="input-cod-socio">Código de socio</label>
                             <input type="text" class="form-control" id="input-cod-socio" placeholder="000000"
                                 readonly />
                         </div>
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label" for="input-nom-socio">Nombre completo</label>
                             <input type="text" class="form-control" id="input-nom-socio" placeholder="Nombre del socio"
                                 readonly />
                         </div>
+
+                    </div>
+
+                    <div class="row">
+                        
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-8 mt-4">
+            <div class="col-md-12 mt-4">
                 <div class="card p-4">
+                    <div>
+                        <h5 class="fw-bold">Datos del prestamo</h5>
+                        <hr>
+                    </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label" for="input-monto-prestamo">Monto</label>
@@ -58,25 +68,12 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label" for="select-forma-pago">Frecuencia de Pago</label>
-                            <select class="form-select" id="select-forma-pago" onchange="mostrarDestinos()">
+                            <select class="form-select" id="select-forma-pago">
                                 <option value="0" selected>Seleccione</option>
-                                <?php 
-
-                                    include_once '../modelo/conexion.php';
-                                    $pdo = conexionBaseDeDatos();
-                                    $sql = "SELECT DISTINCT fp.id_forma_pago, fp.nom_forma_pago FROM forma_pago AS fp
-                                                INNER JOIN destino AS d ON fp.id_forma_pago = d.id_forma_pago
-                                                WHERE d.estado_destino = 1";
-                                    $query = $pdo->prepare($sql);
-                                    $query->execute();
-
-                                    $resultado = $query->fetchAll();
-
-                                    foreach($resultado as $dato){ //Recorremos el array de datos
-                                        echo '<option value="'.$dato['id_forma_pago'].'">'.$dato['nom_forma_pago'].'</option>';
-                                    }
-
-                                ?>  
+                                <option value="1">Diario</option>
+                                <option value="2">Semanal</option>
+                                <option value="3">Quincenal</option>
+                                <option value="4">Mensual</option>
                             </select>
                         </div>
                     </div>
@@ -84,13 +81,36 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="select-destino">Destino</label>
-                            <select class="form-select" id="select-destino" disabled onchange="mostrarInteres()">
+                            <select class="form-select" id="select-destino" onchange="mostrarInteres()">
                                 <option value="0" selected>Seleccione</option>
+
+                                <?php
+                                    include_once '../modelo/conexion.php';
+                                    $conexion = conexionBaseDeDatos();
+            
+                                    try{
+                                        $sql = "SELECT * FROM destino";
+                                        $consulta = $conexion->prepare($sql);
+                                        $consulta->execute();
+            
+                                        if($consulta->rowCount() <= 0){
+                                            echo "<option value='0'>No hay destinos</option>";
+                                        }else{
+                                            while($resultado = $consulta->fetch(PDO::FETCH_ASSOC)){
+                                                echo "<option value='".$resultado['id_destino']."'>".$resultado['nom_destino']."</option>";
+                                            }
+                                        }
+            
+                                    }catch(PDOException $e){
+                                        echo $e->getMessage();
+                                    }
+                                ?>
+
                             </select>
                         </div>
 
                         <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-interes">Tasa de Interés (%)</label>
+                            <label class="form-label" for="input-interes">Tasa de Interés Anual (%)</label>
                             <input type="text" class="form-control" value="" id="input-interes" placeholder="0.00%" disabled />
                         </div>
                         
@@ -102,68 +122,68 @@
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label" for="">&nbsp</label><br>
-                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas" onclick="calcularCuotas()">Generar</button>
+                            <button type="button" class="btn btn-outline-info w-100" id="btn-calcular-cuotas" onclick="calcularCuotas()">Calcular cuotas</button>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-monto-cuota">Monto por cuota</label>
+                    <div class="row">                       
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="input-total-seguro">Total seguro</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-cuota" type="text" class="form-control" value=""
-                                    placeholder="0.00" disabled />
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-monto-interes">Total interés</label>
-                            <div class="input-group input-group-merge disabled">
-                                <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-interes" type="text" class="form-control" value=""
+                                <input id="input-total-seguro" type="text" class="form-control" value=""
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
 
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-seguro-prestamo">Seguro</label>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="input-total-interes">Total Interés</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-seguro-prestamo" type="text" class="form-control" value=""
+                                <input id="input-total-interes" type="text" class="form-control" value=""
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
 
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label" for="input-monto-total">Monto total</label>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="input-total-pagar">Total a pagar</label>
                             <div class="input-group input-group-merge disabled">
                                 <span class="input-group-text" id="basic-addon-search31">$</span>
-                                <input id="input-monto-total" type="text" class="form-control" value=""
+                                <input id="input-total-pagar" type="text" class="form-control" value=""
                                     placeholder="0.00" disabled />
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4 mt-4">
+        <div class="row">
+            <div class="col-md-12 mt-4">
                 <div class="card">
+                    
                     <div class="card-body">
+                        <div>
+                            <h5 class="fw-bold">Plan de pagos</h5>
+                            <hr>
+                        </div>
                         <div class="table-responsive text-nowrap">
-                            <table class="table">
+                            <table class="table table-striped table-hover">
                                 <thead>
                                     <tr class="text-nowrap">
                                         <th>#</th>
                                         <th>Fecha</th>
-                                        <th>Monto</th>
+                                        <th>Capital</th>
                                         <th>Interés</th>
+                                        <th>Seguro</th>
+                                        <th>Total cuota</th>
+                                        <th>Saldo capital</th>
                                     </tr>
                                 </thead>
 
                                 <tbody id="tabla-cuotas">
                                     <tr>
-                                        <td colspan="4" class="text-center">No hay datos</td>
+                                        <td colspan="7" class="text-center">No hay datos para mostrar</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -171,6 +191,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+
     </div>
 </form>
