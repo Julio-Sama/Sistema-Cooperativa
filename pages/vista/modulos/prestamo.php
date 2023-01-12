@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="table-responsive text-nowrap">
-            <table id="tablaPrestamos" class="table table-striped table-sm" wodth>
+            <table id="tablaPrestamos" class="table table-striped table-sm">
                 <thead>
                     <tr>
                         <th class="th-sm">ID</th>
@@ -30,7 +30,7 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="pagination-tabla" class="table-border-bottom-0">
+                <tbody>
                     <?php
                         include_once '../modelo/conexion.php';
                         $conexion = conexionBaseDeDatos();
@@ -66,7 +66,20 @@
                                         echo "<td><span class='badge rounded-pill bg-success'>Cancelado</span></td>";
                                     }
 
-                                    echo "<td><button class='btn btn-outline-info' type='button' onclick='mostrarPlanDePagos(". $resultado['id_prestamo'] .")' data-bs-toggle='modal' data-bs-target='#modalPlandePagos'><span class='tf-icons bx bx-show'></span> Ver pagos</td>";
+                                    echo "<td>";
+                                    echo    '<div class="dropdown-icon-demo">
+                                                <button type="button" class="btn btn-outline-info dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                    <i class="bx bx-menu"></i>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#modalPlandePagos" onclick="mostrarPlanDePagos('. $resultado['id_prestamo'] .')"><i class="bx bx-show me-1"></i>Plan de pagos</a>
+                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trending-down me-1"></i> Amortización</a>
+                                                    <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-coin-stack me-1"></i> Realizar pagos</a>
+                                                    
+                                                </div>
+                                            </div>';
+                                    echo "</td>";
+
                                     echo "</tr>";
                                 }
                             }
